@@ -1,20 +1,20 @@
 import '@/bootstrap';
+import store from '@/store'
 import { Message } from 'element-ui';
 // import { isLogged, setLogged } from '@/utils/auth';
 
 // Create axios instance
 const service = window.axios.create({
   baseURL: process.env.MIX_BASE_API,
-  timeout: 10000, // Request timeout
+  timeout: 50000, // Request timeout
 });
 
 // Request intercepter
 service.interceptors.request.use(
   config => {
-    // const token = isLogged();
-    // if (token) {
-    //   config.headers['Authorization'] = 'Bearer ' + isLogged(); // Set JWT token
-    // }
+    //   // let each request carry token
+    //   // ['X-Token'] is a custom headers key
+    //   // please modify it according to the actual situation
     return config;
   },
   error => {

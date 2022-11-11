@@ -125,15 +125,27 @@ export const constantRoutes = [
     ],
   },
   {
-    path: '/about',
+    path: '/page',
     component: Layout,
-    redirect: '/about/',
+    redirect: '/page/',
+    name: 'Page',
+    alwaysShow: true,
+    meta: {
+      title: 'Page',
+      icon: 'admin',
+    },
     children: [
       {
         path: 'index',
-        component: () => import('@/views/aboutus/index'),
-        name: 'about',
-        meta: { title: 'About', icon: 'user', noCache: true },
+        component: () => import('@/views/page/index'),
+        name: 'Page',
+        meta: { title: 'Page', icon: 'user', noCache: true },
+      },
+      {
+        path: 'create',
+        component: () => import('@/views/page/create'),
+        name: 'Create',
+        meta: { title: 'Create', icon: 'user', noCache: true },
       },
     ],
   },
