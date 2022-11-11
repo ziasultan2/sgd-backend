@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PageRequest;
@@ -26,6 +26,11 @@ class PageController extends Controller
     public function store(PageRequest $request)
     {
         return Page::create($request->all());
+    }
+
+    public function show(Page $page)
+    {
+        return new PageResource($page);
     }
 
     public function update(PageRequest $request, Page $page)

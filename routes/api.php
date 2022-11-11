@@ -38,7 +38,7 @@ Route::namespace('Api')->group(function() {
         Route::put('users/{user}/permissions', 'UserController@updatePermissions')->middleware('permission:' .Acl::PERMISSION_PERMISSION_MANAGE);
         Route::get('roles/{role}/permissions', 'RoleController@permissions')->middleware('permission:' . Acl::PERMISSION_PERMISSION_MANAGE);
 
-        // Route::apiResource('pages', 'PageController');
+        Route::apiResource('pages', 'PageController');
         Route::apiResource('products', 'ProductController');
         Route::apiResource('contacts', 'ContactController');
         Route::apiResource('about', 'AboutController');

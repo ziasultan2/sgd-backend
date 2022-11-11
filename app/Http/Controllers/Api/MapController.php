@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\MapResource;
+use App\Laravue\Models\Map;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class MapController extends Controller
 {
@@ -12,64 +15,30 @@ class MapController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $searchParams = $request->all();
+        $pageQuery = Map::query();
+        $limit = Arr::get($searchParams, 'limit', 10);
+        $keyword = Arr::get($searchParams, 'keyword', '');
+        if (!empty($keyword)) {
+            $pageQuery->where('title_lt', 'LIKE', '%' . $keyword . '%');
+            $pageQuery->orWhere('title_ru', 'LIKE', '%' . $keyword . '%');
+            $pageQuery->where('title_en', 'LIKE', '%' . $keyword . '%');
+        }
+        return MapResource::collection($pageQuery->paginate($limit));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        //
+        return Map::create($request->all());
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
-        //
+        return Map::find($id)->update($request->all());
     }
 
     /**
@@ -80,6 +49,6 @@ class MapController extends Controller
      */
     public function destroy($id)
     {
-        //
+        return Map::destroy($id);
     }
 }
