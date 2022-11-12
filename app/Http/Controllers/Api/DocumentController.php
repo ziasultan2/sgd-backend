@@ -3,7 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\DocumentResource;
+use App\ImageConverter;
+use App\Laravue\Models\Document;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Storage;
 
 class DocumentController extends Controller
 {
@@ -12,74 +17,36 @@ class DocumentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $searchParams = $request->all();
+        $pageQuery = Document::query();
+        $limit = Arr::get($searchParams, 'limit', 10);
+        $keyword = Arr::get($searchParams, 'keyword', '');
+        if (!empty($keyword)) {
+            $pageQuery->where('title_lt', 'LIKE', '%' . $keyword . '%');
+            $pageQuery->orWhere('title_ru', 'LIKE', '%' . $keyword . '%');
+            $pageQuery->where('title_en', 'LIKE', '%' . $keyword . '%');
+        }
+        return DocumentResource::collection($pageQuery->paginate($limit));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        //
+        $path = ImageConverter::convert($request->image);
+        return Document::create([
+            'name' => $request->name,
+            'path' => $path,
+        ]);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
+    public function update(Request $request, Document $document)
     {
-        //
+        return $document->update($request->all());
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
+    public function destroy(Document $document)
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        return $document->delete();
     }
 }

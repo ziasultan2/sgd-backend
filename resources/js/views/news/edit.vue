@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-row>
+    <el-row  v-loading="loading">
       <el-col :span="20">
         <el-form :model="form" status-icon :rules="rules" ref="ruleForm" label-width="120px" class="demo-ruleForm">
           <el-form-item prop="image_uri" style="margin-bottom: 30px;" label="Image">
@@ -45,30 +45,32 @@ export default {
       form: {},
       loading: true,
       id: null,
-      ruleForm: {}
+      ruleForm: {},
+      image_uri: '',
     }
   },
+  created() {
+    this.id = this.$route.params.id;
+    console.log(this.id);
+    this.getData();
+  },
   methods: {
-    submitForm() {
+    getData() {
+      console.log('from get data')
       request({
-        url: `news`,
-        method: 'post',
-        data: this.form
+        url: `news/${this.id}`,
+        method: 'get'
       }).then(res => {
-        this.$message({
-          message: 'Success',
-          type: 'success'
-        });
-        this.$router.push({ name: 'news' });
-      }).catch(err => {
-        this.$message({
-          message: 'Error',
-          type: 'error'
-        });
-      });
+        console.log(res)
+        this.form = res.data;
+        this.loading = false;
+      })
+    },
+    newsForm() {
+
     },
     resetForm() {
-      this.$refs['ruleForm'].resetFields();
+
     },
     handleImageSuccess(file) {
       this.emitInput(file.files.file);

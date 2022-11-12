@@ -1,23 +1,54 @@
 <template>
   <div class="app-container">
     <div v-loading="loading">
-      <pageForm :multiForm="page" :rules="rules"/>
+      <el-col :span="20">
+        <el-form :model="form" status-icon :rules="rules" ref="ruleForm" label-width="120px" class="demo-ruleForm">
+          <el-form-item prop="image_uri" style="margin-bottom: 30px;">
+            <Upload v-model="form.image_uri" />
+          </el-form-item>
+          <el-form-item label="Title (Lt)" prop="title_lt">
+            <el-input type="text" v-model="form.title_lt" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="Description (Lt)" prop="description_lt">
+            <tinymce v-model="form.description_lt" />
+          </el-form-item>
+          <el-form-item label="Title (Ru)" prop="title_ru">
+            <el-input type="text" v-model="form.title_ru" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="Description (RU)" prop="description_ru">
+            <tinymce v-model="form.description_ru" />
+          </el-form-item>
+          <el-form-item label="Title (En)" prop="title_en">
+            <el-input type="text" v-model="form.title_en" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="Description (En)" prop="description_en">
+            <tinymce v-model="form.description_en"/>
+          </el-form-item>
+          <el-form-item label="Action">
+            <el-button type="primary" @click="submitForm('form')">Submit</el-button>
+            <el-button @click="resetForm('form')">Reset</el-button>
+          </el-form-item>
+        </el-form>
+      </el-col>
     </div>
   </div>
 </template>
 
 <script>
 import tinymce from '@/components/Tinymce';
-import pageForm from './component/index';
+import Upload from '@/components/Upload/SingleImage';
 import request from '@/utils/request';
 export default {
-  components: { tinymce, pageForm },
+  components: { tinymce, Upload },
   data() {
     return {
       additionalData: {},
-      page: {},
+      form: {},
       loading: true,
       id: null,
+      imageUrl: '',
+      ruleForm: {},
+      loading: true,
     }
   },
   created() {
@@ -28,16 +59,36 @@ export default {
   methods: {
     getDetail() {
       console.log('id is ', this.id)
+      this.loading = true;
       request({
         url: '/pages/' + this.id,
         method: 'get',
       }).then((res) => {
-        this.page = res.data;
-        console.log('page is ', this.page)
+        this.form = res.data;
+        console.log('page is ', this.form)
         this.loading = false;
         this.$forceUpdate();
       });
     },
+    handleAvatarSuccess(res, file) {
+      this.imageUrl = URL.createObjectURL(file.raw);
+      this.form.image = this.imageUrl
+    },
+    submitForm() {
+      request( {url: 'pages/' + this.id, method :'patch', data : this.form,})
+        .then(response => {
+          this.$message({
+            type: 'success',
+            message: 'Success'
+          })
+        })
+        .catch(error => {
+          this.$message({
+            type: 'error',
+            message: 'Error'
+          })
+        })
+    }
   }
 }
 </script>

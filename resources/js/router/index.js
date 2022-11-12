@@ -119,8 +119,14 @@ export const constantRoutes = [
       {
         path: 'create',
         component: () => import('@/views/news/create'),
-        name: 'News',
+        name: 'editNews',
         meta: { title: 'News', icon: 'user', noCache: true },
+      },
+      {
+        path: 'edit/:id(\\d+)',
+        component: () => import('@/views/news/edit'),
+        name: 'editNews',
+        meta: { title: 'News', icon: 'user', noCache: true, hidden: true },
       },
     ],
   },

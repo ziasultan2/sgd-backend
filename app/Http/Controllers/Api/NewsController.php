@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\NewsRequest;
+use App\Http\Resources\NewsResource;
+use App\ImageConverter;
 use App\Laravue\Models\News;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -29,12 +31,22 @@ class NewsController extends Controller
         if (!empty($keyword)) {
             $newsQuery->where('name', 'LIKE', '%' . $keyword . '%');
         }
-
+        return NewsResource::collection($newsQuery->paginate($limit));
     }
 
     public function store(NewsRequest $request)
     {
-        return News::create($request->all());
+        $path = ImageConverter::convert($request->image_uri);
+        $request->image = $path;
+        return News::create([
+            'title_lt' => $request->title_lt,
+            'description_lt' => $request->description_lt,
+            'title_ru' => $request->title_ru,
+            'description_ru' => $request->description_ru,
+            'title_en' => $request->title_en,
+            'description_en' => $request->description_en,
+            'image' => $path,
+        ]);
     }
 
     /**

@@ -10,6 +10,14 @@
             <el-input type="text" v-model="newsForm.price" autocomplete="off"></el-input>
           </el-form-item>
           <el-form-item>
+
+          <el-form-item label="Name" prop="name">
+            <el-input type="text" v-model="newsForm.name" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="Price" prop="price">
+            <el-input type="text" v-model="newsForm.price" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item>
             <el-button type="primary" @click="submitForm('newsForm')">Submit</el-button>
             <el-button @click="resetForm('newsForm')">Reset</el-button>
           </el-form-item>

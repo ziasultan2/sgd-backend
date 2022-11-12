@@ -25,7 +25,7 @@
 
       <el-table-column align="center" label="File">
         <template slot-scope="scope">
-          <span>{{ scope.row.email }}</span>
+          <span>{{ scope.row.path }}</span>
         </template>
       </el-table-column>
 
@@ -34,7 +34,7 @@
           <el-button type="primary" size="small" icon="el-icon-edit">
               Edit
           </el-button>
-          <el-button v-if="scope.row.roles.includes('visitor')" type="danger" size="small" icon="el-icon-delete" @click="handleDelete(scope.row.id, scope.row.name);">
+          <el-button type="danger" size="small" icon="el-icon-delete" @click="handleDelete(scope.row.id, scope.row.name);">
             Delete
           </el-button>
         </template>
@@ -45,24 +45,11 @@
 
     <el-dialog  :visible.sync="dialogVisible" title="Add document">
       <el-form :model="mapForm" status-icon :rules="rules" ref="ruleForm" label-width="120px" class="demo-ruleForm">
-        <el-form-item label="Title" prop="title">
-          <el-input type="text" v-model="mapForm.title" autocomplete="off"></el-input>
+        <el-form-item label="Name" prop="name">
+          <el-input type="text" v-model="mapForm.name" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="Image" prop="image">
-          <el-upload
-            :data="additionalData"
-            :multiple="false"
-            :show-file-list="false"
-            :on-success="handleImageSuccess"
-            class="image-uploader"
-            drag
-            action="https://httpbin.org/post"
-          >
-            <i class="el-icon-upload" />
-            <div class="el-upload__text">
-              Drag files here or <em>Click to upload</em>
-            </div>
-          </el-upload>
+        <el-form-item prop="image" style="margin-bottom: 30px;">
+          <Upload v-model="mapForm.image" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="submitForm('newsForm')">Submit</el-button>
@@ -76,8 +63,10 @@
 <script>
 import Pagination from '@/components/Pagination';
 import waves from '@/directive/waves'; // Waves directive
+import request from '@/utils/request';
+import Upload from '@/components/Upload/SingleImage';
 export default {
-  components: { Pagination },
+  components: { Pagination, Upload },
   directives: { waves },
   data() {
     return {
@@ -86,6 +75,8 @@ export default {
       dialogVisible: false,
       mapForm: {},
       additionalData: {},
+      image_uri: '',
+      total: 0,
       query: {
         page: 1,
         limit: 15,
@@ -94,7 +85,22 @@ export default {
       },
     }
   },
+  created() {
+    this.getList();
+  },
   methods: {
+    getList() {
+      this.loading = true;
+      request({
+        url: 'documents',
+        method: 'get',
+        params: this.query
+      }).then(res => {
+        this.list = res.data;
+        this.total = res.total;
+        this.loading = false;
+      })
+    },
     handleFilter() {
 
     },
@@ -104,7 +110,21 @@ export default {
     handleImageSuccess(file) {
       this.emitInput(file.files.file);
     },
-    handleDelete() {}
+    handleDelete() {},
+    submitForm() {
+      request({
+        url: 'documents',
+        method: 'post',
+        data: this.mapForm
+      }).then(res => {
+        this.$message({
+          message: 'Add document success',
+          type: 'success'
+        });
+        this.dialogVisible = false;
+        this.getList();
+      })
+    }
   }
 };
 </script>
